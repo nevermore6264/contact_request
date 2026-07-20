@@ -1,0 +1,191 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package com.contracttool.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CustomerRecord {
+    private String taxCode = "";
+    private String contractNo = "";
+    private String partyA = "";
+    private String address = "";
+    private String phone = "";
+    private String account1 = "";
+    private String account2 = "";
+    private String budgetCode = "";
+    private String representative1 = "";
+    private String representative2 = "";
+    private String title1 = "";
+    private String title2 = "";
+    private String year = "";
+    private boolean southPrices = true;
+    private List<String> content = new ArrayList<String>();
+    private List<String> codes = new ArrayList<String>();
+    private List<String> unit = new ArrayList<String>();
+    private List<String> quantities = new ArrayList<String>();
+    private List<String> unitPrices = new ArrayList<String>();
+    private long updatedAt;
+
+    public String getTaxCode() {
+        return this.taxCode;
+    }
+
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
+    }
+
+    public String getContractNo() {
+        return this.contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo;
+    }
+
+    public String getPartyA() {
+        return this.partyA;
+    }
+
+    public void setPartyA(String partyA) {
+        this.partyA = partyA;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return this.phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAccount1() {
+        return this.account1;
+    }
+
+    public void setAccount1(String account1) {
+        this.account1 = account1;
+    }
+
+    public String getAccount2() {
+        return this.account2;
+    }
+
+    public void setAccount2(String account2) {
+        this.account2 = account2;
+    }
+
+    public String getBudgetCode() {
+        return this.budgetCode;
+    }
+
+    public void setBudgetCode(String budgetCode) {
+        this.budgetCode = budgetCode;
+    }
+
+    public String getRepresentative1() {
+        return this.representative1;
+    }
+
+    public void setRepresentative1(String representative1) {
+        this.representative1 = representative1;
+    }
+
+    public String getRepresentative2() {
+        return this.representative2;
+    }
+
+    public void setRepresentative2(String representative2) {
+        this.representative2 = representative2;
+    }
+
+    public String getTitle1() {
+        return this.title1;
+    }
+
+    public void setTitle1(String title1) {
+        this.title1 = title1;
+    }
+
+    public String getTitle2() {
+        return this.title2;
+    }
+
+    public void setTitle2(String title2) {
+        this.title2 = title2;
+    }
+
+    public String getYear() {
+        return this.year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public boolean isSouthPrices() {
+        return this.southPrices;
+    }
+
+    public void setSouthPrices(boolean southPrices) {
+        this.southPrices = southPrices;
+    }
+
+    public List<String> getContent() {
+        return this.content;
+    }
+
+    public void setContent(List<String> content) {
+        this.content = content;
+    }
+
+    public List<String> getCodes() {
+        return this.codes;
+    }
+
+    public void setCodes(List<String> codes) {
+        this.codes = codes;
+    }
+
+    public List<String> getUnit() {
+        return this.unit;
+    }
+
+    public void setUnit(List<String> unit) {
+        this.unit = unit;
+    }
+
+    public List<String> getQuantities() {
+        return this.quantities;
+    }
+
+    public void setQuantities(List<String> quantities) {
+        this.quantities = quantities;
+    }
+
+    public List<String> getUnitPrices() {
+        return this.unitPrices;
+    }
+
+    public void setUnitPrices(List<String> unitPrices) {
+        this.unitPrices = unitPrices;
+    }
+
+    public long getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+}
+
