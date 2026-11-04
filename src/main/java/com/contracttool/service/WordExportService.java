@@ -67,37 +67,19 @@ public class WordExportService {
         if (selectedTypes == null || selectedTypes.isEmpty()) {
             throw new IllegalArgumentException("H\u00e3y ch\u1ecdn \u00edt nh\u1ea5t m\u1ed9t m\u1eabu xu\u1ea5t.");
         }
-        long grand = rows.stream().mapToLong(r -> NumberUtil.parseAmount(r.total())).sum();
-        String totalNumber = NumberUtil.formatDot(grand);
-        String totalText = MoneyWords.toWords(grand);
-        Map<String, String> placeholders = this.buildPlaceholders(info, totalNumber, totalText);
         int count = 0;
         Files.createDirectories(outputFolder, new FileAttribute[0]);
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(inputFolder, "*.docx");){
             for (Path input : stream) {
                 String name = input.getFileName().toString();
                 if (name.startsWith("~$") || ExportDoc.isGuideFile(name) || !this.matchesAny(name, selectedTypes)) continue;
-                Path output = outputFolder.resolve(name);
-                InputStream in = Files.newInputStream(input, new OpenOption[0]);
-                try (XWPFDocument doc = new XWPFDocument(in);){
-                    this.replaceInDocument(doc, placeholders);
-                    // Ẩn dòng trống Tài khoản / Đại diện / Chức vụ (đôi); cả 2 trống thì giữ 1.
-                    this.hideEmptyPairedInfoRows(doc);
-                    boolean omitPrices = WordExportService.isBaoPhatDeliveryFile(name);
-                    boolean filled = this.insertOrReplaceTable(doc, rows, totalNumber, omitPrices);
-                    // Mẫu báo giá cứng (99-1/99-2): điền đúng SP đã chọn trên tool, không lọc theo STT catalog.
-                    if (!filled && WordExportService.isHardcodedQuoteFile(name)) {
-                        this.fillHardcodedQuoteTable(doc, rows, totalNumber);
-                    }
-                    try (OutputStream out = Files.newOutputStream(output, new OpenOption[0]);){
-                        doc.write(out);
-                    }
-                    ++count;
+                boolean omitPrices = WordExportService.isBaoPhatDeliveryFile(name);
+                if (omitPrices && WordExportService.mixedDrug(rows)) {
+                    count += this.writeOne(input, outputFolder.resolve(WordExportService.suffixedFileName(name, " - y tế")), WordExportService.withoutDrug(rows), info, true);
+                    count += this.writeOne(input, outputFolder.resolve(WordExportService.suffixedFileName(name, " - ma tuý")), WordExportService.onlyDrug(rows), info, true);
+                    continue;
                 }
-                finally {
-                    if (in == null) continue;
-                    in.close();
-                }
+                count += this.writeOne(input, outputFolder.resolve(name), rows, info, omitPrices);
             }
         }
         if (count == 0) {
@@ -116,6 +98,77 @@ public class WordExportService {
     private static boolean isHardcodedQuoteFile(String fileName) {
         String n = ExportDoc.strip(fileName);
         return n.contains("99-1") || n.contains("99-2") || n.contains("baogia-1") || n.contains("baogia-2");
+    }
+
+    private int writeOne(Path input, Path output, List<LineItem> rows, ContractInfo info, boolean omitPrices) throws IOException {
+        long grand = rows.stream().mapToLong(r -> NumberUtil.parseAmount(r.total())).sum();
+        String totalNumber = NumberUtil.formatDot(grand);
+        String totalText = MoneyWords.toWords(grand);
+        Map<String, String> placeholders = this.buildPlaceholders(info, totalNumber, totalText);
+        try (InputStream in = Files.newInputStream(input, new OpenOption[0]);
+             XWPFDocument doc = new XWPFDocument(in);){
+            if (!info.isThreeParty()) {
+                this.removePartyCSection(doc);
+            }
+            this.replaceInDocument(doc, placeholders);
+            // Ẩn dòng trống Tài khoản / Đại diện / Chức vụ (đôi); cả 2 trống thì giữ 1.
+            this.hideEmptyPairedInfoRows(doc);
+            boolean filled = this.insertOrReplaceTable(doc, rows, totalNumber, omitPrices);
+            // Mẫu báo giá cứng (99-1/99-2): điền đúng SP đã chọn trên tool, không lọc theo STT catalog.
+            if (!filled && WordExportService.isHardcodedQuoteFile(input.getFileName().toString())) {
+                this.fillHardcodedQuoteTable(doc, rows, totalNumber);
+            }
+            try (OutputStream out = Files.newOutputStream(output, new OpenOption[0]);){
+                doc.write(out);
+            }
+        }
+        return 1;
+    }
+
+    /** Có cả đơn vị TEST (ma túy) và đơn vị khác (y tế) — báo phát tách thành 2 file. */
+    private static boolean mixedDrug(List<LineItem> rows) {
+        boolean drug = false;
+        boolean normal = false;
+        for (LineItem item : rows) {
+            if (item.drug()) {
+                drug = true;
+            } else {
+                normal = true;
+            }
+            if (drug && normal) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<LineItem> onlyDrug(List<LineItem> rows) {
+        ArrayList<LineItem> out = new ArrayList<LineItem>();
+        for (LineItem item : rows) {
+            if (item.drug()) {
+                out.add(item);
+            }
+        }
+        return out;
+    }
+
+    private static List<LineItem> withoutDrug(List<LineItem> rows) {
+        ArrayList<LineItem> out = new ArrayList<LineItem>();
+        for (LineItem item : rows) {
+            if (!item.drug()) {
+                out.add(item);
+            }
+        }
+        return out;
+    }
+
+    /** "8. Báo Phát.docx" + " - y tế" → "8. Báo Phát - y tế.docx" */
+    private static String suffixedFileName(String fileName, String suffix) {
+        int dot = fileName.lastIndexOf('.');
+        if (dot <= 0) {
+            return fileName + suffix;
+        }
+        return fileName.substring(0, dot) + suffix + fileName.substring(dot);
     }
 
     /** BBGN báo phát: bảng hàng hóa không hiện Đơn giá / Thành tiền / Tổng cộng. */
@@ -248,6 +301,17 @@ public class WordExportService {
         map.put("{{DaiDien2}}", this.nullToEmpty(info.getRepresentative2()));
         map.put("{{ChucVu1}}", this.nullToEmpty(info.getTitle1()));
         map.put("{{ChucVu2}}", this.nullToEmpty(info.getTitle2()));
+        map.put("{{BenC}}", this.nullToEmpty(info.getPartyC()));
+        map.put("{{DiaChi1}}", this.nullToEmpty(info.getAddressC()));
+        map.put("{{DienThoai1}}", this.nullToEmpty(info.getPhoneC()));
+        map.put("{{TaiKhoan3}}", WordExportService.oneLine(info.getAccountC()));
+        map.put("{{TaiKhoan4}}", WordExportService.oneLine(info.getAccountC2()));
+        map.put("{{MaSoThue1}}", this.nullToEmpty(info.getTaxCodeC()));
+        map.put("{{MaQHNS1}}", this.nullToEmpty(info.getBudgetCodeC()));
+        map.put("{{DaiDien3}}", this.nullToEmpty(info.getRepresentativeC()));
+        map.put("{{DaiDien4}}", this.nullToEmpty(info.getRepresentativeC2()));
+        map.put("{{ChucVu3}}", this.nullToEmpty(info.getTitleC()));
+        map.put("{{ChucVu4}}", this.nullToEmpty(info.getTitleC2()));
         map.put("{{HopDong}}", this.nullToEmpty(info.getContractNo()));
         map.put("{{MaQHNS}}", this.nullToEmpty(info.getBudgetCode()));
         map.put("{{Nam}}", this.nullToEmpty(info.getYear()));
@@ -297,7 +361,7 @@ public class WordExportService {
         }
         if (!changed || WordExportService.stillHasPlaceholder(updated, placeholders)) {
             updated = full;
-            for (Map.Entry<String, String> e : placeholders.entrySet()) {
+            for (Map.Entry<String, String> e : WordExportService.placeholdersLongestFirst(placeholders)) {
                 updated = updated.replace(e.getKey(), e.getValue() == null ? "" : (CharSequence)e.getValue());
             }
             while (!paragraph.getRuns().isEmpty()) {
@@ -324,7 +388,7 @@ public class WordExportService {
             String text = run.text();
             if (text == null || text.isEmpty()) continue;
             String next = text;
-            for (Map.Entry<String, String> e : placeholders.entrySet()) {
+            for (Map.Entry<String, String> e : WordExportService.placeholdersLongestFirst(placeholders)) {
                 if (!next.contains(e.getKey())) continue;
                 next = next.replace(e.getKey(), e.getValue() == null ? "" : (CharSequence)e.getValue());
                 changed = true;
@@ -333,6 +397,13 @@ public class WordExportService {
             run.setText(next, 0);
         }
         return changed;
+    }
+
+    /** {{DiaChi1}} phải thay trước {{DiaChi}}, kẻo mã Bên C bị cắt thành mã Bên A. */
+    private static List<Map.Entry<String, String>> placeholdersLongestFirst(Map<String, String> placeholders) {
+        ArrayList<Map.Entry<String, String>> list = new ArrayList<Map.Entry<String, String>>(placeholders.entrySet());
+        list.sort((a, b) -> Integer.compare(b.getKey().length(), a.getKey().length()));
+        return list;
     }
 
     private static boolean stillHasPlaceholder(String text, Map<String, String> placeholders) {
@@ -345,7 +416,7 @@ public class WordExportService {
 
     private void writeFormattedParagraph(XWPFParagraph paragraph, String text) {
         String lower = text.toLowerCase(Locale.ROOT);
-        if (lower.contains("b\u00ean a") && text.contains(":")) {
+        if ((lower.contains("b\u00ean a") || lower.contains("b\u00ean c")) && text.contains(":")) {
             int colon = text.indexOf(58);
             String label = text.substring(0, colon + 1);
             String value = text.substring(colon + 1);
@@ -747,6 +818,67 @@ public class WordExportService {
         tblWidth.setW((Object)BigInteger.valueOf(width));
     }
 
+    /** Placeholder chỉ có ở khối Bên C (bên nhận). Hợp đồng 2 bên thì xóa cả dòng. */
+    private static final String[] PARTY_C_MARKERS = new String[]{
+        "{{BenC}}", "{{DiaChi1}}", "{{DienThoai1}}", "{{TaiKhoan3}}", "{{TaiKhoan4}}",
+        "{{MaSoThue1}}", "{{MaQHNS1}}", "{{DaiDien3}}", "{{DaiDien4}}", "{{ChucVu3}}", "{{ChucVu4}}"
+    };
+
+    private void removePartyCSection(XWPFDocument doc) {
+        ArrayList<XWPFParagraph> paragraphs = new ArrayList<XWPFParagraph>(doc.getParagraphs());
+        for (XWPFParagraph paragraph : paragraphs) {
+            if (WordExportService.containsPartyCMarker(paragraph.getText())) {
+                int pos = doc.getPosOfParagraph(paragraph);
+                if (pos >= 0) {
+                    doc.removeBodyElement(pos);
+                }
+            }
+        }
+        for (XWPFTable table : new ArrayList<XWPFTable>(doc.getTables())) {
+            this.removePartyCRows(table);
+        }
+    }
+
+    private void removePartyCRows(XWPFTable table) {
+        for (int i = table.getNumberOfRows() - 1; i >= 0; --i) {
+            XWPFTableRow row = table.getRow(i);
+            if (WordExportService.rowContainsPartyC(row)) {
+                table.removeRow(i);
+                continue;
+            }
+            for (XWPFTableCell cell : row.getTableCells()) {
+                for (XWPFTable nested : new ArrayList<XWPFTable>(cell.getTables())) {
+                    this.removePartyCRows(nested);
+                }
+            }
+        }
+    }
+
+    private static boolean rowContainsPartyC(XWPFTableRow row) {
+        StringBuilder text = new StringBuilder();
+        for (XWPFTableCell cell : row.getTableCells()) {
+            for (XWPFParagraph paragraph : cell.getParagraphs()) {
+                String line = paragraph.getText();
+                if (line != null) {
+                    text.append(line);
+                }
+            }
+        }
+        return WordExportService.containsPartyCMarker(text.toString());
+    }
+
+    private static boolean containsPartyCMarker(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+        for (String marker : PARTY_C_MARKERS) {
+            if (text.contains(marker)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Ẩn dòng trống của cặp: Tài khoản số / Đại diện / Chức vụ.
      * - Có dữ liệu: giữ. Không có: ẩn.
@@ -873,9 +1005,13 @@ public class WordExportService {
         return s == null ? "" : s;
     }
 
-    public record LineItem(String content, String unit, String qty, String price, String total, String brand) {
+    public record LineItem(String content, String unit, String qty, String price, String total, String brand, boolean drug) {
         public LineItem(String content, String unit, String qty, String price, String total) {
-            this(content, unit, qty, price, total, "");
+            this(content, unit, qty, price, total, "", false);
+        }
+
+        public LineItem(String content, String unit, String qty, String price, String total, String brand) {
+            this(content, unit, qty, price, total, brand, false);
         }
     }
 }

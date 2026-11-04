@@ -12,7 +12,7 @@ public final class App {
     }
 
     public static void main(String[] args) {
-        // Tạo F:\TOOL - CAM XOA\ContractToolData + 3 file JSON nếu chưa có (hoặc local nếu chưa map F:).
+        // Tạo F:\TOOL - HOP DONG\ContractToolData + 3 file JSON nếu chưa có (hoặc local nếu chưa map F:).
         try {
             AppPaths.ensureDataFiles();
         }

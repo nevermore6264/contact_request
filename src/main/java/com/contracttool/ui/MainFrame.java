@@ -165,6 +165,28 @@ extends JFrame {
     private final JTextField rep2 = new JTextField();
     private final JTextField title1 = new JTextField();
     private final JTextField title2 = new JTextField();
+    private final JTextArea partyC = new JTextArea(3, 40);
+    private final JTextArea addressC = new JTextArea(2, 40);
+    private final JTextField phoneC = new JTextField();
+    private final JTextArea accountC = new JTextArea(2, 28);
+    private final JTextArea accountC2 = new JTextArea(2, 28);
+    private final JTextField taxCodeC = new JTextField();
+    private final JTextField budgetCodeC = new JTextField();
+    private final JTextField repC = new JTextField();
+    private final JTextField repC2 = new JTextField();
+    private final JTextField titleC = new JTextField();
+    private final JTextField titleC2 = new JTextField();
+    private final JToggleButton tabTwoParty = new JToggleButton("2 B\u00caN");
+    private final JToggleButton tabThreeParty = new JToggleButton("3 B\u00caN");
+    private final JToggleButton tabSideA = new JToggleButton("B\u00caN A (MUA)");
+    private final JToggleButton tabSideC = new JToggleButton("B\u00caN C (NH\u1eacN)");
+    private JPanel infoForm;
+    private JPanel partyABlock;
+    private JPanel partyCBlock;
+    private JPanel sideTabs;
+    private final java.awt.CardLayout partyCards = new java.awt.CardLayout();
+    private final JPanel partyHolder = new JPanel(this.partyCards);
+    private int partyLabelWidth;
     private final JTextField year = new JTextField(String.valueOf(Year.now().getValue()));
 
     public MainFrame() {
@@ -670,7 +692,7 @@ extends JFrame {
                 String where = AppPaths.usingSharedDrive()
                         ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
                         : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                                + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - CAM XOA\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                                + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
                 JOptionPane.showMessageDialog(dialog, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU B\u1ea2NG M\u00c0U", 1);
             } else {
                 JOptionPane.showMessageDialog(dialog, "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c file:\n" + path, "L\u1ed7i", 0);
@@ -804,72 +826,226 @@ extends JFrame {
     private JPanel buildInfoForm() {
         JPanel info = new JPanel(new GridBagLayout());
         info.setOpaque(false);
+        this.infoForm = info;
+        this.partyLabelWidth = this.measurePartyLabelWidth();
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(2, 3, 2, 3);
         c.fill = 2;
         int y = 0;
+        y = this.addToggleRow(info, c, y, this.tabTwoParty, this.tabThreeParty, true);
         c.gridx = 0;
         c.gridy = y++;
         c.weightx = 0.0;
         c.gridwidth = 1;
         JLabel lbHd = new JLabel("S\u1ed0 H\u1ee2P \u0110\u1ed2NG");
         lbHd.setFont(UiTheme.FONT_BOLD);
+        this.pinPartyLabel(lbHd);
         info.add((Component)lbHd, c);
         c.gridx = 1;
         c.weightx = 1.0;
         this.contractNo.setFont(UiTheme.FONT);
         info.add((Component)this.contractNo, c);
-        y = this.addAutoGrowArea(info, y, "B\u00caN MUA", this.partyA, 4, "V\u00ed d\u1ee5: V\u0102N PH\u00d2NG H\u1ed8I \u0110\u1ed2NG NH\u00c2N D\u00c2N & \u1ee6Y BAN NH\u00c2N D\u00c2N X\u00c3 TR\u01af\u01a0NG NGUY\u1ec4N HO\u00c0NG MINH H\u01af\u01a0NG", true);
-        y = this.addAutoGrowArea(info, y, "\u0110\u1ecaA CH\u1ec8", this.address, 4, "Xu\u1ed1ng d\u00f2ng \u0111\u1ec3 xem \u0111\u1ee7 \u0111\u1ecba ch\u1ec9, d\u1ec5 b\u1eaft l\u1ed7i ch\u00ednh t\u1ea3", false);
+        y = this.addToggleRow(info, c, y, this.tabSideA, this.tabSideC, false);
+        this.sideTabs = (JPanel)info.getComponent(info.getComponentCount() - 1);
+        this.partyABlock = this.buildPartyABlock();
+        this.partyCBlock = this.buildPartyCBlock();
+        this.partyHolder.setOpaque(false);
+        this.partyHolder.add((Component)this.partyABlock, "A");
+        this.partyHolder.add((Component)this.partyCBlock, "C");
+        c.gridx = 0;
+        c.gridy = y++;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.fill = 2;
+        c.anchor = 11;
+        info.add((Component)this.partyHolder, c);
+        c.gridwidth = 1;
+        c.anchor = 10;
+        this.year.setEditable(false);
+        this.year.setHorizontalAlignment(0);
+        this.year.setForeground(UiTheme.NAM_RED);
+        Object[][] yearRow = new Object[][]{{"N\u0102M", this.year}};
+        this.addInfoFields(info, c, y, yearRow);
+        this.year.setFont(UiTheme.FONT_SIZE20);
+        this.pinPartyField(this.year);
+        MainFrame.addUppercase(this.contractNo, this.title1, this.title2, this.titleC, this.titleC2);
+        MainFrame.addUppercaseDoc(this.partyA);
+        MainFrame.addUppercaseDoc(this.address);
+        MainFrame.addUppercaseDoc(this.account1);
+        MainFrame.addUppercaseDoc(this.account2);
+        MainFrame.addUppercaseDoc(this.partyC);
+        MainFrame.addUppercaseDoc(this.addressC);
+        MainFrame.addUppercaseDoc(this.accountC);
+        MainFrame.addUppercaseDoc(this.accountC2);
+        MainFrame.useTabToChangeFocus(this.partyA, this.address, this.account1, this.account2, this.partyC, this.addressC, this.accountC, this.accountC2);
+        MainFrame.addDigitsOnly(this.taxCode, 15);
+        MainFrame.addDigitsOnly(this.phone, 15);
+        MainFrame.addDigitsOnly(this.budgetCode, 30);
+        MainFrame.addDigitsOnly(this.phoneC, 15);
+        MainFrame.addDigitsOnly(this.taxCodeC, 15);
+        MainFrame.addDigitsOnly(this.budgetCodeC, 30);
+        MainFrame.addRepFormat(this.rep1, this.rep2, this.repC, this.repC2);
+        this.tabTwoParty.addActionListener(e -> {
+            if (this.tabTwoParty.isSelected()) {
+                this.applyPartyMode();
+            }
+        });
+        this.tabThreeParty.addActionListener(e -> {
+            if (this.tabThreeParty.isSelected()) {
+                this.applyPartyMode();
+            }
+        });
+        this.tabSideA.addActionListener(e -> {
+            if (this.tabSideA.isSelected()) {
+                this.applyPartyMode();
+            }
+        });
+        this.tabSideC.addActionListener(e -> {
+            if (this.tabSideC.isSelected()) {
+                this.applyPartyMode();
+            }
+        });
+        this.applyPartyMode();
+        return info;
+    }
+
+    /** Hợp đồng 2 bên: chỉ Bên A. Hợp đồng 3 bên: chuyển tab để nhập Bên A hoặc Bên C. Bên B cố định trong mẫu. */
+    private void applyPartyMode() {
+        boolean three = this.tabThreeParty.isSelected();
+        if (this.sideTabs != null) {
+            this.sideTabs.setVisible(three);
+        }
+        boolean showC = three && this.tabSideC.isSelected();
+        this.partyCards.show(this.partyHolder, showC ? "C" : "A");
+        if (this.infoForm != null) {
+            this.infoForm.revalidate();
+            this.infoForm.repaint();
+        }
+    }
+
+    private int addToggleRow(JPanel info, GridBagConstraints c, int y, JToggleButton left, JToggleButton right, boolean selectLeft) {
+        ButtonGroup group = new ButtonGroup();
+        group.add(left);
+        group.add(right);
+        this.stylePreset(left);
+        this.stylePreset(right);
+        if (selectLeft) {
+            left.setSelected(true);
+        } else {
+            left.setSelected(true);
+        }
+        JPanel tabs = new JPanel(new java.awt.GridLayout(1, 2, 6, 0));
+        tabs.setOpaque(false);
+        tabs.add(left);
+        tabs.add(right);
+        c.gridx = 0;
+        c.gridy = y++;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.fill = 2;
+        c.insets = new Insets(6, 3, 4, 3);
+        info.add((Component)tabs, c);
+        c.gridwidth = 1;
+        c.insets = new Insets(2, 3, 2, 3);
+        return y;
+    }
+
+    private JPanel buildPartyABlock() {
+        JPanel block = new JPanel(new GridBagLayout());
+        block.setOpaque(false);
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(2, 3, 2, 3);
+        c.fill = 2;
+        int y = 0;
+        y = this.addAutoGrowArea(block, y, "B\u00caN A (MUA)", this.partyA, 4, "V\u00ed d\u1ee5: V\u0102N PH\u00d2NG H\u1ed8I \u0110\u1ed2NG NH\u00c2N D\u00c2N & \u1ee6Y BAN NH\u00c2N D\u00c2N X\u00c3 TR\u01af\u01a0NG NGUY\u1ec4N HO\u00c0NG MINH H\u01af\u01a0NG", true);
+        y = this.addAutoGrowArea(block, y, "\u0110\u1ecaA CH\u1ec8", this.address, 4, "Xu\u1ed1ng d\u00f2ng \u0111\u1ec3 xem \u0111\u1ee7 \u0111\u1ecba ch\u1ec9, d\u1ec5 b\u1eaft l\u1ed7i ch\u00ednh t\u1ea3", false);
+        c.gridx = 0;
+        c.gridy = y++;
+        c.weightx = 0.0;
+        c.gridwidth = 1;
+        JLabel lbPhone = new JLabel("\u0110I\u1ec6N THO\u1ea0I");
+        lbPhone.setFont(UiTheme.FONT_BOLD);
+        this.pinPartyLabel(lbPhone);
+        block.add((Component)lbPhone, c);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        this.phone.setFont(UiTheme.FONT);
+        this.pinPartyField(this.phone);
+        block.add((Component)this.phone, c);
+        y = this.addAutoGrowArea(block, y, "T\u00c0I KHO\u1ea2N #1", this.account1, 3, "Nh\u1eadp \u0111\u1ee7, g\u1ed3m c\u1ea3 KHU V\u1ef0C IX; xu\u1ea5t file s\u1ebd n\u1eb1m sau d\u1ea5u :", false);
+        y = this.addAutoGrowArea(block, y, "T\u00c0I KHO\u1ea2N #2", this.account2, 3, null, false);
+        Object[][] rows = new Object[][]{{"M\u00c3 QHNS", this.budgetCode}, {"\u0110\u1ea0I DI\u1ec6N #1", this.rep1}, {"\u0110\u1ea0I DI\u1ec6N #2", this.rep2}, {"CH\u1ee8C V\u1ee4 #1", this.title1}, {"CH\u1ee8C V\u1ee4 #2", this.title2}};
+        this.addInfoFields(block, c, y, rows);
+        return block;
+    }
+
+    private JPanel buildPartyCBlock() {
+        JPanel block = new JPanel(new GridBagLayout());
+        block.setOpaque(false);
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(2, 3, 2, 3);
+        c.fill = 2;
+        int y = 0;
+        y = this.addAutoGrowArea(block, y, "B\u00caN C (NH\u1eacN)", this.partyC, 4, "B\u00ean nh\u1eadn. B\u00ean B gi\u1eef nguy\u00ean trong m\u1eabu Word.", true);
+        y = this.addAutoGrowArea(block, y, "\u0110\u1ecaA CH\u1ec8", this.addressC, 4, null, false);
+        c.gridx = 0;
+        c.gridy = y++;
+        c.weightx = 0.0;
+        c.gridwidth = 1;
+        JLabel lbPhone = new JLabel("\u0110I\u1ec6N THO\u1ea0I");
+        lbPhone.setFont(UiTheme.FONT_BOLD);
+        this.pinPartyLabel(lbPhone);
+        block.add((Component)lbPhone, c);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        this.phoneC.setFont(UiTheme.FONT);
+        this.pinPartyField(this.phoneC);
+        block.add((Component)this.phoneC, c);
+        y = this.addAutoGrowArea(block, y, "T\u00c0I KHO\u1ea2N #1", this.accountC, 3, null, false);
+        y = this.addAutoGrowArea(block, y, "T\u00c0I KHO\u1ea2N #2", this.accountC2, 3, null, false);
         c.gridx = 0;
         c.gridy = y++;
         c.weightx = 0.0;
         c.gridwidth = 1;
         c.fill = 2;
-        c.ipady = 0;
-        JLabel lbPhone = new JLabel("\u0110I\u1ec6N THO\u1ea0I");
-        lbPhone.setFont(UiTheme.FONT_BOLD);
-        info.add((Component)lbPhone, c);
+        JLabel lbTax = new JLabel("M\u00c3 S\u1ed0 THU\u1ebe");
+        lbTax.setFont(UiTheme.FONT_BOLD);
+        this.pinPartyLabel(lbTax);
+        block.add((Component)lbTax, c);
         c.gridx = 1;
         c.weightx = 1.0;
-        this.phone.setFont(UiTheme.FONT);
-        info.add((Component)this.phone, c);
-        y = this.addAutoGrowArea(info, y, "T\u00c0I KHO\u1ea2N #1", this.account1, 3, "Nh\u1eadp \u0111\u1ee7, g\u1ed3m c\u1ea3 KHU V\u1ef0C IX; xu\u1ea5t file s\u1ebd n\u1eb1m sau d\u1ea5u :", false);
-        y = this.addAutoGrowArea(info, y, "T\u00c0I KHO\u1ea2N #2", this.account2, 3, null, false);
-        Object[][] rows = new Object[][]{{"M\u00c3 QHNS", this.budgetCode}, {"\u0110\u1ea0I DI\u1ec6N #1", this.rep1}, {"\u0110\u1ea0I DI\u1ec6N #2", this.rep2}, {"CH\u1ee8C V\u1ee4 #1", this.title1}, {"CH\u1ee8C V\u1ee4 #2", this.title2}, {"N\u0102M", this.year}};
-        int n3 = rows.length;
+        this.taxCodeC.setFont(UiTheme.FONT);
+        this.pinPartyField(this.taxCodeC);
+        block.add((Component)this.taxCodeC, c);
+        Object[][] rows = new Object[][]{{"M\u00c3 QHNS", this.budgetCodeC}, {"\u0110\u1ea0I DI\u1ec6N #1", this.repC}, {"\u0110\u1ea0I DI\u1ec6N #2", this.repC2}, {"CH\u1ee8C V\u1ee4 #1", this.titleC}, {"CH\u1ee8C V\u1ee4 #2", this.titleC2}};
+        this.addInfoFields(block, c, y, rows);
+        return block;
+    }
+
+    private int addInfoFields(JPanel info, GridBagConstraints c, int y, Object[][] rows) {
         int n = 0;
-        while (n < n3) {
+        while (n < rows.length) {
             Object[] row = rows[n];
             c.gridx = 0;
             c.gridy = y++;
             c.weightx = 0.0;
             c.gridwidth = 1;
+            c.fill = 2;
             JLabel label = new JLabel((String)row[0]);
             label.setFont(UiTheme.FONT_BOLD);
+            this.pinPartyLabel(label);
             info.add((Component)label, c);
             c.gridx = 1;
             c.weightx = 1.0;
             JTextField field = (JTextField)row[1];
             field.setFont(UiTheme.FONT);
+            this.pinPartyField(field);
             info.add((Component)field, c);
             ++n;
         }
-        this.year.setEditable(false);
-        this.year.setHorizontalAlignment(0);
-        this.year.setFont(UiTheme.FONT_SIZE20);
-        this.year.setForeground(UiTheme.NAM_RED);
-        MainFrame.addUppercase(this.contractNo, this.title1, this.title2);
-        MainFrame.addUppercaseDoc(this.partyA);
-        MainFrame.addUppercaseDoc(this.address);
-        MainFrame.addUppercaseDoc(this.account1);
-        MainFrame.addUppercaseDoc(this.account2);
-        MainFrame.useTabToChangeFocus(this.partyA, this.address, this.account1, this.account2);
-        MainFrame.addDigitsOnly(this.taxCode, 15);
-        MainFrame.addDigitsOnly(this.phone, 15);
-        MainFrame.addDigitsOnly(this.budgetCode, 30);
-        MainFrame.addRepFormat(this.rep1, this.rep2);
-        return info;
+        return y;
     }
 
     private static void useTabToChangeFocus(JTextArea ... areas) {
@@ -899,6 +1075,7 @@ extends JFrame {
         c.ipady = 0;
         JLabel label = new JLabel(labelText);
         label.setFont(UiTheme.FONT_BOLD);
+        this.pinPartyLabel(label);
         info.add((Component)label, c);
         area.setFont(bold ? UiTheme.FONT_BOLD.deriveFont(13.0f) : UiTheme.FONT);
         area.setLineWrap(true);
@@ -929,6 +1106,48 @@ extends JFrame {
         c.fill = 2;
         info.add((Component)wrap, c);
         return y + 1;
+    }
+
+    /** Cùng bề ngang cột nhãn để ô nhập Bên A và Bên C thẳng hàng. */
+    private int measurePartyLabelWidth() {
+        FontMetrics fm = this.getFontMetrics(UiTheme.FONT_BOLD);
+        String[] labels = new String[]{
+            "S\u1ed0 H\u1ee2P \u0110\u1ed2NG",
+            "B\u00caN A (MUA)",
+            "B\u00caN C (NH\u1eacN)",
+            "\u0110\u1ecaA CH\u1ec8",
+            "\u0110I\u1ec6N THO\u1ea0I",
+            "T\u00c0I KHO\u1ea2N #1",
+            "T\u00c0I KHO\u1ea2N #2",
+            "M\u00c3 S\u1ed0 THU\u1ebe",
+            "M\u00c3 QHNS",
+            "\u0110\u1ea0I DI\u1ec6N #1",
+            "\u0110\u1ea0I DI\u1ec6N #2",
+            "CH\u1ee8C V\u1ee4 #1",
+            "CH\u1ee8C V\u1ee4 #2",
+            "N\u0102M"
+        };
+        int w = 0;
+        int i = 0;
+        while (i < labels.length) {
+            w = Math.max(w, fm.stringWidth(labels[i]));
+            ++i;
+        }
+        return w + 6;
+    }
+
+    private void pinPartyLabel(JLabel label) {
+        int h = Math.max(label.getPreferredSize().height, 22);
+        Dimension d = new Dimension(this.partyLabelWidth, h);
+        label.setPreferredSize(d);
+        label.setMinimumSize(d);
+        label.setHorizontalAlignment(2);
+    }
+
+    private static void pinPartyField(JTextField field) {
+        Dimension pref = field.getPreferredSize();
+        int h = Math.max(30, pref.height);
+        field.setPreferredSize(new Dimension(Math.max(80, pref.width), h));
     }
 
     private void applyAutoGrowHeight(JTextArea area, JComponent host, int maxRows) {
@@ -1700,7 +1919,8 @@ extends JFrame {
                 if (brand.isBlank()) {
                     brand = code.replace('\n', ' ').trim();
                 }
-                rows.add(new WordExportService.LineItem(content, unit.isEmpty() ? " " : unit, NumberUtil.formatDot(qty), NumberUtil.formatDot(price), NumberUtil.formatDot(qty * price), brand));
+                boolean drug = "TEST".equalsIgnoreCase(unit);
+                rows.add(new WordExportService.LineItem(content, unit.isEmpty() ? " " : unit, NumberUtil.formatDot(qty), NumberUtil.formatDot(price), NumberUtil.formatDot(qty * price), brand, drug));
             }
             ++i;
         }
@@ -1736,6 +1956,24 @@ extends JFrame {
         this.rep2.setText(MainFrame.formatRepresentative(MainFrame.nullToEmpty(rec.getRepresentative2())));
         this.title1.setText(MainFrame.nullToEmpty(rec.getTitle1()));
         this.title2.setText(MainFrame.nullToEmpty(rec.getTitle2()));
+        this.partyC.setText(MainFrame.nullToEmpty(rec.getPartyC()));
+        this.addressC.setText(MainFrame.nullToEmpty(rec.getAddressC()));
+        this.phoneC.setText(MainFrame.nullToEmpty(rec.getPhoneC()));
+        this.accountC.setText(MainFrame.nullToEmpty(rec.getAccountC()));
+        this.accountC2.setText(MainFrame.nullToEmpty(rec.getAccountC2()));
+        this.taxCodeC.setText(MainFrame.nullToEmpty(rec.getTaxCodeC()));
+        this.budgetCodeC.setText(MainFrame.nullToEmpty(rec.getBudgetCodeC()));
+        this.repC.setText(MainFrame.formatRepresentative(MainFrame.nullToEmpty(rec.getRepresentativeC())));
+        this.repC2.setText(MainFrame.formatRepresentative(MainFrame.nullToEmpty(rec.getRepresentativeC2())));
+        this.titleC.setText(MainFrame.nullToEmpty(rec.getTitleC()));
+        this.titleC2.setText(MainFrame.nullToEmpty(rec.getTitleC2()));
+        if (rec.isThreeParty()) {
+            this.tabThreeParty.setSelected(true);
+        } else {
+            this.tabTwoParty.setSelected(true);
+        }
+        this.tabSideA.setSelected(true);
+        this.applyPartyMode();
         if (rec.getYear() != null && !rec.getYear().isBlank()) {
             this.year.setText(rec.getYear());
         }
@@ -1760,6 +1998,18 @@ extends JFrame {
             rec.setRepresentative2(this.rep2.getText());
             rec.setTitle1(this.title1.getText());
             rec.setTitle2(this.title2.getText());
+            rec.setThreeParty(this.tabThreeParty.isSelected());
+            rec.setPartyC(this.partyC.getText());
+            rec.setAddressC(this.addressC.getText());
+            rec.setPhoneC(this.phoneC.getText());
+            rec.setAccountC(this.accountC.getText());
+            rec.setAccountC2(this.accountC2.getText());
+            rec.setTaxCodeC(this.taxCodeC.getText());
+            rec.setBudgetCodeC(this.budgetCodeC.getText());
+            rec.setRepresentativeC(this.repC.getText());
+            rec.setRepresentativeC2(this.repC2.getText());
+            rec.setTitleC(this.titleC.getText());
+            rec.setTitleC2(this.titleC2.getText());
             rec.setYear(this.year.getText());
             rec.setSouthPrices(this.southPrices);
             rec.setContent(new ArrayList<String>());
@@ -1772,7 +2022,7 @@ extends JFrame {
             String where = AppPaths.usingSharedDrive()
                     ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
                     : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - CAM XOA\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
             JOptionPane.showMessageDialog(this, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU D\u1eee LI\u1ec6U KH\u00c1CH H\u00c0NG", 1);
         }
         catch (Exception ex) {
@@ -1787,7 +2037,7 @@ extends JFrame {
             String where = AppPaths.usingSharedDrive()
                     ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
                     : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - CAM XOA\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
             JOptionPane.showMessageDialog(this, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU D\u1eee LI\u1ec6U H\u00c0NG H\u00d3A", 1);
         }
         catch (Exception ex) {
@@ -1873,6 +2123,19 @@ extends JFrame {
         info.setRepresentative2(this.rep2.getText());
         info.setTitle1(this.title1.getText());
         info.setTitle2(this.title2.getText());
+        boolean three = this.tabThreeParty.isSelected();
+        info.setThreeParty(three);
+        info.setPartyC(three ? this.partyC.getText() : "");
+        info.setAddressC(three ? this.addressC.getText() : "");
+        info.setPhoneC(three ? this.phoneC.getText() : "");
+        info.setAccountC(three ? this.accountC.getText() : "");
+        info.setAccountC2(three ? this.accountC2.getText() : "");
+        info.setTaxCodeC(three ? this.taxCodeC.getText() : "");
+        info.setBudgetCodeC(three ? this.budgetCodeC.getText() : "");
+        info.setRepresentativeC(three ? this.repC.getText() : "");
+        info.setRepresentativeC2(three ? this.repC2.getText() : "");
+        info.setTitleC(three ? this.titleC.getText() : "");
+        info.setTitleC2(three ? this.titleC2.getText() : "");
         info.setYear(this.year.getText());
         return info;
     }

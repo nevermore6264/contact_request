@@ -11,8 +11,8 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 
 public final class AppPaths {
-    /** Ổ data chung công ty: F:\TOOL - CAM XOA\ContractToolData\ */
-    private static final Path SHARED_DIR = Path.of("F:\\", "TOOL - CAM XOA", "ContractToolData");
+    /** Ổ data chung công ty: F:\TOOL - HOP DONG\ContractToolData\ */
+    private static final Path SHARED_DIR = Path.of("F:\\", "TOOL - HOP DONG", "ContractToolData");
     private static final Path LOCAL_DIR = Path.of(System.getProperty("user.home"), "ContractToolData");
     private static final String PRODUCT_FILE = "hang_hoa_bac_nam.json";
     private static final String CUSTOMER_FILE = "khach_hang.json";

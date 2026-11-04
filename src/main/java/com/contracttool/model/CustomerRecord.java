@@ -19,6 +19,18 @@ public class CustomerRecord {
     private String representative2 = "";
     private String title1 = "";
     private String title2 = "";
+    private boolean threeParty;
+    private String partyC = "";
+    private String addressC = "";
+    private String phoneC = "";
+    private String accountC = "";
+    private String accountC2 = "";
+    private String taxCodeC = "";
+    private String budgetCodeC = "";
+    private String representativeC = "";
+    private String representativeC2 = "";
+    private String titleC = "";
+    private String titleC2 = "";
     private String year = "";
     private boolean southPrices = true;
     private List<String> content = new ArrayList<String>();
@@ -122,6 +134,102 @@ public class CustomerRecord {
 
     public void setTitle2(String title2) {
         this.title2 = title2;
+    }
+
+    public boolean isThreeParty() {
+        return this.threeParty;
+    }
+
+    public void setThreeParty(boolean threeParty) {
+        this.threeParty = threeParty;
+    }
+
+    public String getPartyC() {
+        return this.partyC;
+    }
+
+    public void setPartyC(String partyC) {
+        this.partyC = partyC;
+    }
+
+    public String getAddressC() {
+        return this.addressC;
+    }
+
+    public void setAddressC(String addressC) {
+        this.addressC = addressC;
+    }
+
+    public String getPhoneC() {
+        return this.phoneC;
+    }
+
+    public void setPhoneC(String phoneC) {
+        this.phoneC = phoneC;
+    }
+
+    public String getAccountC() {
+        return this.accountC;
+    }
+
+    public void setAccountC(String accountC) {
+        this.accountC = accountC;
+    }
+
+    public String getTaxCodeC() {
+        return this.taxCodeC;
+    }
+
+    public void setTaxCodeC(String taxCodeC) {
+        this.taxCodeC = taxCodeC;
+    }
+
+    public String getRepresentativeC() {
+        return this.representativeC;
+    }
+
+    public void setRepresentativeC(String representativeC) {
+        this.representativeC = representativeC;
+    }
+
+    public String getTitleC() {
+        return this.titleC;
+    }
+
+    public void setTitleC(String titleC) {
+        this.titleC = titleC;
+    }
+
+    public String getAccountC2() {
+        return this.accountC2;
+    }
+
+    public void setAccountC2(String accountC2) {
+        this.accountC2 = accountC2;
+    }
+
+    public String getBudgetCodeC() {
+        return this.budgetCodeC;
+    }
+
+    public void setBudgetCodeC(String budgetCodeC) {
+        this.budgetCodeC = budgetCodeC;
+    }
+
+    public String getRepresentativeC2() {
+        return this.representativeC2;
+    }
+
+    public void setRepresentativeC2(String representativeC2) {
+        this.representativeC2 = representativeC2;
+    }
+
+    public String getTitleC2() {
+        return this.titleC2;
+    }
+
+    public void setTitleC2(String titleC2) {
+        this.titleC2 = titleC2;
     }
 
     public String getYear() {
