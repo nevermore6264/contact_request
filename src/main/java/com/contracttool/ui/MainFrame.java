@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -121,7 +122,8 @@ extends JFrame {
     private static final int[] DEFAULT_NORTH = new int[]{73000, 75000, 86000, 39500, 39500, 39500, 73000, 75000, 86000, 89000, 39500, 39500, 39500, 46500, 39500, 39500, 110000, 39500};
     private static final String[] DEFAULT_CONTENTS = new String[]{"Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 4 trong 1\n- Morphine/ Heroin (MOP/OPI)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (ECSTASY/MDMA)\nH\u1ed9p 25 Test\nModel: 74716", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 5 trong 1 \n- Morphine/ Heroin (MOP/OPI)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (ECSTASY/MDMA)\n- Ketamine (KET)\nH\u1ed9p 25 Test\nModel: 75025", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 6 trong 1 \n- Morphine/ Heroin (MOP/OPI)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (MDMA)\n- Ketamine (KET)\n- Cocaine (COC)\nH\u1ed9p 25 Test\nModel: 76005", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh C\u1ecf M\u1ef9 (K2)\nH\u1ed9p 50 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Morphine (MOP)\nH\u1ed9p 50 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Methamphetamine Ma t\u00fay \u0111\u00e1 (MET)\nH\u1ed9p 50 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111inh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 4.1\n- Morphine/ Heroin (MOP)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (MDMA)\nH\u1ed9p 25 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111inh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 5.1\n- Morphine/ Heroin (MOP)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (MDMA)\n- Ketamine (KET)\nH\u1ed9p 25 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111inh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 6.1\n- Morphine/Heroin (OPI)\n- C\u1ea7n sa (THC)\n- Ma t\u00fay \u0111\u00e1 (MET)\n- Thu\u1ed1c l\u1eafc (MDMA)\n- Amphetamine (AMP)(AMP)\n- Ketamine (KET)\nH\u1ed9p 25 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111inh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 7.1\n- Codein (COD)\n- Heroin (HER)\n- Ketamine (KET)\n- Amphetamine (AMP) \n- C\u1ecf M\u1ef9 (K2)\n- C\u1ea7n sa (THC)\n- Morphine (MOP)\nH\u1ed9p 25 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh C\u1ea7n sa t\u1ed5ng h\u1ee3p K2\nH\u1ed9p 50Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Morphine\nH\u1ed9p 50Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Methamphetamine\nH\u1ed9p 50Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Ketamine (KET)\nH\u1ed9p 40 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh C\u1ea7n sa (THC/Marijuana)\nH\u1ed9p 50 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Thu\u1ed1c l\u1eafc (ECSTASY/MDMA)\nH\u1ed9p 50 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh ma t\u00fay t\u1ed5ng h\u1ee3p 5.1 (m\u1eabu n\u01b0\u1edbc b\u1ecdt)\nH\u1ed9p 25 Test", "Que th\u1eed x\u00e9t nghi\u1ec7m \u0111\u1ecbnh t\u00ednh Amphetamine (AMP)\nH\u1ed9p 50 Test"};
     private static final String[] DEFAULT_CODES = new String[]{"74716\nCHEMTRUE", "75025\nCHEMTRUE", "76005\nCHEMTRUE", "K2\nCHEMTRUE", "MOP\nCHEMTRUE", "MET\nCHEMTRUE", "4.1\nASSURE", "5.1\nASSURE", "6.1\nASSURE", "7.1\nASSURE", "K2\nASSURE", "MOP\nASSURE", "MET\nASSURE", "KET\nASSURE", "THC\nASSURE", "MDMA\nASSURE", "5.1\nASSURE", "AMP\nASSURE"};
-    private final ProductTableModel tableModel = new ProductTableModel();
+    private final BrandColorStore brandColors = new BrandColorStore();
+    private final ProductTableModel tableModel = new ProductTableModel(this.brandColors::isKnownBrand);
     private final JTable table = new JTable(this.tableModel);
     private final TableRowSorter<ProductTableModel> productSorter = new TableRowSorter<ProductTableModel>(this.tableModel);
     private JScrollPane tableScroll;
@@ -130,7 +132,6 @@ extends JFrame {
     private final JLabel folderLabel = new JLabel("Th\u01b0 m\u1ee5c g\u1ed1c: (ch\u01b0a ch\u1ecdn)  |  Th\u01b0 m\u1ee5c xu\u1ea5t: (ch\u01b0a ch\u1ecdn)");
     private final DataStore dataStore = new DataStore(AppPaths.savedProducts());
     private final CustomerStore customerStore = new CustomerStore(AppPaths.customerHistory());
-    private final BrandColorStore brandColors = new BrandColorStore();
     private final WordExportService wordService = new WordExportService();
     private Path inputFolder;
     private Path outputFolder;
@@ -200,6 +201,7 @@ extends JFrame {
         this.loadSavedData();
         this.refreshTotals();
         this.resizeRows();
+        this.setTitle("TOOL - HOP DONG  |  Data: " + AppPaths.dataDir());
     }
 
     private void initDefaults() {
@@ -347,7 +349,7 @@ extends JFrame {
         JButton btnBrandColor = UiTheme.actionButton("COLOR");
         btnBrandColor.setFont(UiTheme.FONT_SIZE20);
         btnBrandColor.setBackground(new Color(8141549));
-        btnBrandColor.setToolTipText("\u0110\u1eb7t m\u00e0u ch\u1eef h\u00e3ng \u1edf c\u1ed9t M\u00c3 CODE (CHEMTRUE, ASSURE\u2026)");
+        btnBrandColor.setToolTipText("\u0110\u1eb7t m\u00e0u ch\u1eef h\u00e3ng (d\u00f2ng 2) ho\u1eb7c t\u00ean n\u01b0\u1edbc (m\u1ed9t d\u00f2ng, c\u00f3 d\u1ea5u c\u00e1ch) \u1edf c\u1ed9t M\u00c3 CODE.");
         btnBrandColor.addActionListener(e -> this.showBrandColorDialog());
         saveZone.add(btnSaveData);
         saveZone.add(btnBrandColor);
@@ -404,7 +406,7 @@ extends JFrame {
         cols.getColumn(1).setCellRenderer(new MultiLineRenderer());
         cols.getColumn(1).setCellEditor(new ContentCellEditor());
         cols.getColumn(2).setCellRenderer(new CodeCellRenderer());
-        cols.getColumn(2).setCellEditor(new CodeCellEditor());
+        cols.getColumn(2).setCellEditor(new CodeCellEditor(this.brandColors::isKnownBrand));
         DefaultTableCellRenderer bold20 = this.boldCenterRenderer(UiTheme.FONT_SIZE20, Color.BLACK);
         int[] nArray = new int[]{3, 4, 5};
         int n = nArray.length;
@@ -602,7 +604,7 @@ extends JFrame {
         JDialog dialog = new JDialog(this, "C\u00c0I \u0110\u1eb6T M\u00c0U THEO H\u00c3NG", true);
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.getContentPane().setBackground(UiTheme.BG);
-        JLabel hint = new JLabel("<html>Ch\u1ecdn m\u00e0u ch\u1eef <b>d\u00f2ng 2</b> c\u1ed9t M\u00c3 CODE.<br/>C\u00f3 th\u1ec3 <b>th\u00eam</b> ho\u1eb7c <b>x\u00f3a</b> h\u00e3ng (vd. g\u00f5 nh\u1ea7m) \u2014 l\u01b0u v\u00e0o file.</html>");
+        JLabel hint = new JLabel("<html>Ch\u1ecdn m\u00e0u ch\u1eef c\u1ed9t M\u00c3 CODE.<br/><b>H\u00e3ng</b> (FASTEP) n\u1eb1m d\u00f2ng 2. <b>T\u00ean n\u01b0\u1edbc</b> (VI\u1ec6T NAM) gi\u1eef m\u1ed9t d\u00f2ng, v\u1eabn \u0111\u1ed5i m\u00e0u \u0111\u01b0\u1ee3c \u2014 th\u00eam \u0111\u00fang c\u1ea3 d\u1ea5u c\u00e1ch.</html>");
         hint.setBorder(BorderFactory.createEmptyBorder(12, 14, 4, 14));
         hint.setFont(UiTheme.FONT);
         Path colorPath = this.brandColors.path().toAbsolutePath();
@@ -610,8 +612,8 @@ extends JFrame {
         String pathHtml = onShared
                 ? "<html><b>File:</b> " + colorPath + "</html>"
                 : "<html><b>File \u0111ang d\u00f9ng (T\u1ea0M C:):</b> " + colorPath
-                        + "<br/><font color='#B00020'><b>Ch\u01b0a map \u1ed5 F:</b> " + AppPaths.sharedDir()
-                        + "<br/>Map F: xong m\u1edf l\u1ea1i tool \u2014 m\u1eddi x\u00f3a/l\u01b0u m\u1edbi \u0111\u00fang \u1ed5 chung.</font></html>";
+                        + "<br/><font color='#B00020'><b>Ch\u01b0a map \u1ed5 F: ho\u1eb7c Z:</b> " + AppPaths.sharedDir()
+                        + "<br/>Map F: ho\u1eb7c Z: xong m\u1edf l\u1ea1i tool \u2014 m\u1eddi x\u00f3a/l\u01b0u m\u1edbi \u0111\u00fang \u1ed5 chung.</font></html>";
         JLabel pathLabel = new JLabel(pathHtml);
         pathLabel.setFont(UiTheme.FONT.deriveFont(11.0f));
         pathLabel.setForeground(onShared ? UiTheme.MUTED : new Color(0xB00020));
@@ -619,7 +621,7 @@ extends JFrame {
         JPanel addRow = new JPanel(new FlowLayout(0, 8, 4));
         addRow.setOpaque(false);
         addRow.setBorder(BorderFactory.createEmptyBorder(0, 10, 4, 10));
-        JLabel addLbl = new JLabel("TH\u00caM H\u00c3NG M\u1edaI");
+        JLabel addLbl = new JLabel("TH\u00caM H\u00c3NG / N\u01af\u1edaC");
         addLbl.setFont(UiTheme.FONT_BOLD);
         JTextField newBrand = new JTextField(16);
         newBrand.setFont(UiTheme.FONT_BOLD);
@@ -664,7 +666,7 @@ extends JFrame {
         btnAdd.addActionListener(ev -> {
             String name = BrandColorStore.normalize(newBrand.getText());
             if (name.isBlank()) {
-                JOptionPane.showMessageDialog(dialog, "Nh\u1eadp t\u00ean h\u00e3ng (vd. CHEMTRUE, ASSURE\u2026).", "Thi\u1ebfu t\u00ean", 2);
+                JOptionPane.showMessageDialog(dialog, "Nh\u1eadp t\u00ean h\u00e3ng ho\u1eb7c n\u01b0\u1edbc (vd. FASTEP, VI\u1ec6T NAM).", "Thi\u1ebfu t\u00ean", 2);
                 return;
             }
             boolean existed = this.brandColors.all().containsKey(name);
@@ -691,8 +693,7 @@ extends JFrame {
             if (ok) {
                 String where = AppPaths.usingSharedDrive()
                         ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
-                        : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                                + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                        : AppPaths.localSaveNotice(path);
                 JOptionPane.showMessageDialog(dialog, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU B\u1ea2NG M\u00c0U", 1);
             } else {
                 JOptionPane.showMessageDialog(dialog, "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c file:\n" + path, "L\u1ed7i", 0);
@@ -1759,7 +1760,7 @@ extends JFrame {
                 text = "";
             }
             text = text.replace("\r\n", "\n").replace('\r', '\n');
-            String code = MainFrame.normalizeCodeFormat(String.valueOf(this.tableModel.getValueAt(modelRow, 2)));
+            String code = this.formatCode(String.valueOf(this.tableModel.getValueAt(modelRow, 2)));
             int h;
             if (text.isBlank() && code.isBlank()) {
                 h = MIN_ROW_HEIGHT;
@@ -1788,12 +1789,17 @@ extends JFrame {
         }
     }
 
-    static String normalizeCodeFormat(String raw) {
+    /**
+     * Dòng 2 chỉ khi từ cuối là hãng đã có màu (FASTEP, CHEMTRUE…).
+     * Tên nước có dấu cách, ví dụ VIỆT NAM, giữ một dòng.
+     */
+    static String normalizeCodeFormat(String raw, Predicate<String> knownBrand) {
         String brand;
         String type;
         if (raw == null) {
             return "";
         }
+        Predicate<String> isBrand = knownBrand == null ? name -> false : knownBrand;
         String t = raw.replace("\r\n", "\n").replace('\r', '\n').trim();
         if (t.isEmpty()) {
             return "";
@@ -1808,15 +1814,9 @@ extends JFrame {
             brand = parts.length > 1 ? parts[1].trim() : "";
         } else {
             int lastSpace = t.lastIndexOf(32);
-            if (lastSpace > 0) {
-                String maybeBrand = t.substring(lastSpace + 1).trim();
-                if (maybeBrand.matches("\\p{L}{2,}")) {
-                    type = t.substring(0, lastSpace).trim();
-                    brand = maybeBrand;
-                } else {
-                    type = t;
-                    brand = "";
-                }
+            if (lastSpace > 0 && isBrand.test(t.substring(lastSpace + 1).trim())) {
+                type = t.substring(0, lastSpace).trim();
+                brand = t.substring(lastSpace + 1).trim();
             } else {
                 type = t;
                 brand = "";
@@ -1824,24 +1824,33 @@ extends JFrame {
         }
         type = type.toUpperCase(Locale.ROOT);
         brand = BrandColorStore.normalize(brand);
+        if (!brand.isEmpty() && !isBrand.test(brand)) {
+            type = (type + " " + brand).trim();
+            brand = "";
+        }
         if (brand.isEmpty()) {
             return type;
         }
         return type + "\n" + brand;
     }
 
+    private String formatCode(String raw) {
+        return MainFrame.normalizeCodeFormat(raw, this.brandColors::isKnownBrand);
+    }
+
     static String brandOf(String code) {
-        String n = MainFrame.normalizeCodeFormat(code);
-        if (!n.contains("\n")) {
+        if (code == null || !code.contains("\n")) {
             return "";
         }
-        return n.substring(n.indexOf(10) + 1).trim();
+        return code.substring(code.indexOf(10) + 1).trim();
     }
 
     static String typeOf(String code) {
-        String n = MainFrame.normalizeCodeFormat(code);
-        int i = n.indexOf(10);
-        return i < 0 ? n : n.substring(0, i);
+        if (code == null) {
+            return "";
+        }
+        int i = code.indexOf(10);
+        return i < 0 ? code : code.substring(0, i);
     }
 
     private void chooseFolder(boolean template) {
@@ -1914,7 +1923,7 @@ extends JFrame {
             if (qty > 0L) {
                 String unit = String.valueOf(this.tableModel.getValueAt(i, 3)).trim();
                 String content = String.valueOf(this.tableModel.getValueAt(i, 1)).replace("\r\n", "\n").replace('\r', '\n').replaceAll("\\n+$", "");
-                String code = MainFrame.normalizeCodeFormat(String.valueOf(this.tableModel.getValueAt(i, 2)));
+                String code = this.formatCode(String.valueOf(this.tableModel.getValueAt(i, 2)));
                 String brand = MainFrame.brandOf(code);
                 if (brand.isBlank()) {
                     brand = code.replace('\n', ' ').trim();
@@ -2021,8 +2030,7 @@ extends JFrame {
             Path path = AppPaths.customerHistory();
             String where = AppPaths.usingSharedDrive()
                     ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
-                    : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                    : AppPaths.localSaveNotice(path);
             JOptionPane.showMessageDialog(this, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU D\u1eee LI\u1ec6U KH\u00c1CH H\u00c0NG", 1);
         }
         catch (Exception ex) {
@@ -2036,8 +2044,7 @@ extends JFrame {
             Path path = this.persistProductData();
             String where = AppPaths.usingSharedDrive()
                     ? "\u0110\u00e3 l\u01b0u \u1ed5 data chung c\u00f4ng ty:\n" + path
-                    : "Kh\u00f4ng ghi \u0111\u01b0\u1ee3c \u1ed5 F: \u2014 \u0111\u00e3 l\u01b0u t\u1ea1m local:\n" + path
-                            + "\n\nH\u00e3y map \u1ed5 F:\\TOOL - HOP DONG\\ContractToolData \u0111\u1ec3 c\u1ea3 c\u00f4ng ty d\u00f9ng chung.";
+                    : AppPaths.localSaveNotice(path);
             JOptionPane.showMessageDialog(this, "\u0110\u00c3 L\u01afU TH\u00c0NH C\u00d4NG\n\n" + where, "L\u01afU D\u1eee LI\u1ec6U H\u00c0NG H\u00d3A", 1);
         }
         catch (Exception ex) {
@@ -2069,7 +2076,7 @@ extends JFrame {
                 south.add(i < oldSouth.size() && oldSouth.get(i) != null ? oldSouth.get(i) : defS);
             }
             content.add(String.valueOf(this.tableModel.getValueAt(i, 1)));
-            codes.add(String.valueOf(this.tableModel.getValueAt(i, 2)));
+            codes.add(this.formatCode(String.valueOf(this.tableModel.getValueAt(i, 2))));
             units.add(String.valueOf(this.tableModel.getValueAt(i, 3)));
             ++i;
         }
@@ -2098,7 +2105,7 @@ extends JFrame {
                 this.tableModel.setValueAt(data.getContent().get(i), i, 1);
             }
             if (data.getCodes() != null && i < data.getCodes().size() && data.getCodes().get(i) != null && !data.getCodes().get(i).isBlank()) {
-                this.tableModel.setValueAt(MainFrame.normalizeCodeFormat(data.getCodes().get(i)), i, 2);
+                this.tableModel.setValueAt(this.formatCode(data.getCodes().get(i)), i, 2);
             }
             if (data.getUnit() != null && i < data.getUnit().size()) {
                 this.tableModel.setValueAt(data.getUnit().get(i), i, 3);
@@ -2523,13 +2530,15 @@ extends JFrame {
     extends AbstractCellEditor
     implements TableCellEditor {
         private final JTextArea area = new JTextArea(2, 8);
+        private final Predicate<String> knownBrand;
         private JTable editingTable;
         private int editingRow = -1;
         private int editingColumn = -1;
 
-        CodeCellEditor() {
+        CodeCellEditor(Predicate<String> knownBrand) {
+            this.knownBrand = knownBrand == null ? name -> false : knownBrand;
             this.area.setFont(UiTheme.FONT_BOLD.deriveFont(18.0f));
-            this.area.setLineWrap(true);
+            this.area.setLineWrap(false);
             this.area.setBorder(BorderFactory.createLineBorder(UiTheme.BTN_TEAL, 2));
             MainFrame.addUppercaseDoc(this.area);
             MainFrame.bindEditorTabKeys(this.area, this, () -> this.editingTable, () -> this.editingRow, () -> this.editingColumn);
@@ -2547,7 +2556,7 @@ extends JFrame {
 
         @Override
         public Object getCellEditorValue() {
-            return MainFrame.normalizeCodeFormat(this.area.getText());
+            return MainFrame.normalizeCodeFormat(this.area.getText(), this.knownBrand);
         }
 
         @Override
@@ -2555,7 +2564,7 @@ extends JFrame {
             this.editingTable = tbl;
             this.editingRow = row;
             this.editingColumn = column;
-            this.area.setText(MainFrame.normalizeCodeFormat(value == null ? "" : String.valueOf(value)));
+            this.area.setText(MainFrame.normalizeCodeFormat(value == null ? "" : String.valueOf(value), this.knownBrand));
             this.area.selectAll();
             return this.area;
         }
@@ -2585,15 +2594,21 @@ extends JFrame {
 
         @Override
         public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            String code = MainFrame.normalizeCodeFormat(value == null ? "" : String.valueOf(value));
-            this.typeLabel.setText(MainFrame.typeOf(code));
+            String code = MainFrame.this.formatCode(value == null ? "" : String.valueOf(value));
+            String type = MainFrame.typeOf(code);
+            this.typeLabel.setText(type);
             String brand = MainFrame.brandOf(code);
             this.brandLabel.setText(brand);
             this.brandLabel.setVisible(!brand.isBlank());
-            Color brandColor = brand.isBlank() ? Color.DARK_GRAY : MainFrame.this.brandColors.colorFor(brand);
             this.setBackground(isSelected ? UiTheme.ROW_SELECTED : Color.WHITE);
-            this.typeLabel.setForeground(Color.BLACK);
-            this.brandLabel.setForeground(brandColor);
+            if (!brand.isBlank()) {
+                this.typeLabel.setForeground(Color.BLACK);
+                this.brandLabel.setForeground(MainFrame.this.brandColors.colorFor(brand));
+            } else if (MainFrame.this.brandColors.isKnownBrand(type)) {
+                this.typeLabel.setForeground(MainFrame.this.brandColors.colorFor(type));
+            } else {
+                this.typeLabel.setForeground(Color.BLACK);
+            }
             return this;
         }
     }
@@ -2629,8 +2644,10 @@ extends JFrame {
     extends AbstractTableModel {
         private final String[] columns = new String[]{"STT", "N\u1ed8I DUNG C\u00d4NG VI\u1ec6C", "M\u00c3 CODE", "\u0110\u01a0N V\u1eca T\u00cdNH", "S\u1ed0 L\u01af\u1ee2NG", "\u0110\u01a0N GI\u00c1", "TH\u00c0NH TI\u1ec0N"};
         private final Object[][] data = new Object[ROW_COUNT][7];
+        private final Predicate<String> knownBrand;
 
-        ProductTableModel() {
+        ProductTableModel(Predicate<String> knownBrand) {
+            this.knownBrand = knownBrand == null ? name -> false : knownBrand;
             int i = 0;
             while (i < ROW_COUNT) {
                 this.data[i][0] = i + 1;
@@ -2676,7 +2693,7 @@ extends JFrame {
             if (columnIndex == 4 || columnIndex == 5) {
                 value = value.isBlank() ? "0" : NumberUtil.formatTyping(value);
             } else if (columnIndex == 2) {
-                value = MainFrame.normalizeCodeFormat(value);
+                value = MainFrame.normalizeCodeFormat(value, this.knownBrand);
             } else if (columnIndex == 3) {
                 value = value.toUpperCase(Locale.ROOT);
             } else if (columnIndex == 1) {

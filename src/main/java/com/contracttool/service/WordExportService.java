@@ -43,6 +43,8 @@ import java.util.Set;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.UnderlinePatterns;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFFooter;
+import org.apache.poi.xwpf.usermodel.XWPFHeader;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
@@ -118,6 +120,7 @@ public class WordExportService {
             if (!filled && WordExportService.isHardcodedQuoteFile(input.getFileName().toString())) {
                 this.fillHardcodedQuoteTable(doc, rows, totalNumber);
             }
+            this.forceDotSeparators(doc);
             try (OutputStream out = Files.newOutputStream(output, new OpenOption[0]);){
                 doc.write(out);
             }
@@ -770,6 +773,58 @@ public class WordExportService {
         }
     }
 
+    /** Mọi số dạng 10,000 / 1,000,000 trong file Word đổi thành 10.000 / 1.000.000. */
+    private void forceDotSeparators(XWPFDocument doc) {
+        for (XWPFParagraph paragraph : doc.getParagraphs()) {
+            this.forceDotSeparators(paragraph);
+        }
+        for (XWPFTable table : doc.getTables()) {
+            this.forceDotSeparators(table);
+        }
+        for (XWPFHeader header : doc.getHeaderList()) {
+            for (XWPFParagraph paragraph : header.getParagraphs()) {
+                this.forceDotSeparators(paragraph);
+            }
+            for (XWPFTable table : header.getTables()) {
+                this.forceDotSeparators(table);
+            }
+        }
+        for (XWPFFooter footer : doc.getFooterList()) {
+            for (XWPFParagraph paragraph : footer.getParagraphs()) {
+                this.forceDotSeparators(paragraph);
+            }
+            for (XWPFTable table : footer.getTables()) {
+                this.forceDotSeparators(table);
+            }
+        }
+    }
+
+    private void forceDotSeparators(XWPFTable table) {
+        for (XWPFTableRow row : table.getRows()) {
+            for (XWPFTableCell cell : row.getTableCells()) {
+                for (XWPFParagraph paragraph : cell.getParagraphs()) {
+                    this.forceDotSeparators(paragraph);
+                }
+                for (XWPFTable nested : cell.getTables()) {
+                    this.forceDotSeparators(nested);
+                }
+            }
+        }
+    }
+
+    private void forceDotSeparators(XWPFParagraph paragraph) {
+        for (XWPFRun run : paragraph.getRuns()) {
+            String text = run.getText(0);
+            if (text == null || text.indexOf(',') < 0) {
+                continue;
+            }
+            String next = NumberUtil.dotsNotCommas(text);
+            if (!next.equals(text)) {
+                run.setText(next, 0);
+            }
+        }
+    }
+
     private void setCellText(XWPFTableCell cell, String text, boolean center) {
         if (cell == null) {
             return;
@@ -789,7 +844,7 @@ public class WordExportService {
             p.setSpacingBefore(0);
             p.setSpacingAfter(0);
             XWPFRun run = p.createRun();
-            run.setText(lines[i] == null ? "" : lines[i]);
+            run.setText(lines[i] == null ? "" : NumberUtil.dotsNotCommas(lines[i]));
             run.setFontFamily("Times New Roman");
             run.setFontSize(11);
             run.setBold(boldAll);

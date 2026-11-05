@@ -75,6 +75,11 @@ public class BrandColorStore {
         }
     }
 
+    public boolean isKnownBrand(String brand) {
+        String key = BrandColorStore.normalize(brand);
+        return !key.isEmpty() && this.brandToHex.containsKey(key);
+    }
+
     public Color colorFor(String brand) {
         String key = BrandColorStore.normalize(brand);
         if (key.isEmpty()) {
