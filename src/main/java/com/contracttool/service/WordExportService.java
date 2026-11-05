@@ -103,6 +103,10 @@ public class WordExportService {
     }
 
     private int writeOne(Path input, Path output, List<LineItem> rows, ContractInfo info, boolean omitPrices) throws IOException {
+        long priceBump = WordExportService.quotePriceBump(input.getFileName().toString());
+        if (priceBump > 0L) {
+            rows = WordExportService.quoteRows(rows, priceBump);
+        }
         long grand = rows.stream().mapToLong(r -> NumberUtil.parseAmount(r.total())).sum();
         String totalNumber = NumberUtil.formatDot(grand);
         String totalText = MoneyWords.toWords(grand);
@@ -633,6 +637,28 @@ public class WordExportService {
             }
         }
         return true;
+    }
+
+    /** Báo giá 1 = giá cung ứng + 5.000đ, báo giá 2 = + 10.000đ. Số lượng luôn là 1. */
+    private static long quotePriceBump(String fileName) {
+        String n = ExportDoc.strip(fileName);
+        if (n.contains("99-1") || n.contains("baogia-1")) {
+            return 5000L;
+        }
+        if (n.contains("99-2") || n.contains("baogia-2") || n.contains("baogia") && n.contains("-2") && !n.contains("cung")) {
+            return 10000L;
+        }
+        return 0L;
+    }
+
+    private static List<LineItem> quoteRows(List<LineItem> rows, long priceBump) {
+        ArrayList<LineItem> adjusted = new ArrayList<LineItem>();
+        for (LineItem item : rows) {
+            long price = NumberUtil.parseAmount(item.price()) + priceBump;
+            String amount = NumberUtil.formatDot(price);
+            adjusted.add(new LineItem(item.content(), item.unit(), "1", amount, amount, item.brand(), item.drug()));
+        }
+        return adjusted;
     }
 
     /** Điền lại bảng báo giá cứng (99-1/99-2) bằng đúng các dòng đã chọn trên tool. */
